@@ -1,5 +1,4 @@
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class TestaConexao {
@@ -7,8 +6,8 @@ public class TestaConexao {
 	public static void main(String[] args) throws SQLException {
 		// TODO Auto-generated method stub
 
-		Connection connection = DriverManager.getConnection(
-"jdbc:mysql://localhost/loja_virtual?useTimezone=true&serverTimezone=UTC", "root", "bancodedados");
+		ConnectionFactory connectionFactory = new ConnectionFactory();
+		Connection connection = connectionFactory.RecuperarConexao();
 		
 		System.out.println("Fechando conexão!");
 		connection.close();
