@@ -14,11 +14,23 @@ public class TestaInsercaoComParametro {
 
 		// PreparedStatemt que cuida da inserção. SetString passa os parametros, index e
 		// parametro
-		PreparedStatement stm = connection.prepareStatement("INSERT INTO PRODUTO (NOME, DESCRICAO) VALUES (?, ?)",
-				Statement.RETURN_GENERATED_KEYS);
+		try {
+			PreparedStatement stm = connection.prepareStatement("INSERT INTO PRODUTO (NOME, DESCRICAO) VALUES (?, ?)",
+					Statement.RETURN_GENERATED_KEYS);
 
-		adicionarVariavel("SmartTV", "50 polegadas", stm);
-		adicionarVariavel("Home Theater", "Onkyo 5.1 canais", stm);
+			adicionarVariavel("SmartTV", "50 polegadas", stm);
+			adicionarVariavel("Home Theater", "Onkyo 5.1 canais", stm);
+
+			connection.commit();
+
+			stm.close();
+			connection.close();
+
+		} catch (Exception excecao) {
+			excecao.printStackTrace(); // printStackTrace() fala qual foi a exceção
+			System.out.println("ROLLBACK EXECUTADO");
+			connection.close();
+		}
 
 	}
 
@@ -26,10 +38,10 @@ public class TestaInsercaoComParametro {
 		stm.setString(1, nome);
 		stm.setString(2, descricao);
 
-		/*
-		 * if (nome.equals("Home Theater")) { throw new
-		 * RuntimeException("Não foi possível adicionar o produto"); }
-		 */
+		if (nome.equals("Home Theater")) {
+			throw new RuntimeException("Não foi possível adicionar o produto");
+		}
+
 		stm.execute();
 
 		ResultSet rst = stm.getGeneratedKeys();
