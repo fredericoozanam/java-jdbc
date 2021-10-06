@@ -9,29 +9,26 @@ public class TestaInsercaoComParametro {
 	public static void main(String[] args) throws SQLException {
 
 		ConnectionFactory factory = new ConnectionFactory();
-		Connection connection = factory.RecuperarConexao();
-		connection.setAutoCommit(false);
+		
+		//try-with-resources - autoclosable para a conexão
+		try (Connection connection = factory.RecuperarConexao()) {
+			connection.setAutoCommit(false);
 
-		// PreparedStatemt que cuida da inserção. SetString passa os parametros, index e
-		// parametro
-		try {
-			PreparedStatement stm = connection.prepareStatement("INSERT INTO PRODUTO (NOME, DESCRICAO) VALUES (?, ?)",
-					Statement.RETURN_GENERATED_KEYS);
+			// PreparedStatemt que cuida da inserção. SetString passa os parametros, index e
+			// parametro
+			try (PreparedStatement stm = connection.prepareStatement(
+					"INSERT INTO PRODUTO (NOME, DESCRICAO) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);) {
 
-			adicionarVariavel("SmartTV", "50 polegadas", stm);
-			adicionarVariavel("Home Theater", "Onkyo 5.1 canais", stm);
+				adicionarVariavel("SmartTV", "50 polegadas", stm);
+				adicionarVariavel("Home Theater", "Onkyo 5.1 canais", stm);
 
-			connection.commit();
+				connection.commit();
 
-			stm.close();
-			connection.close();
-
-		} catch (Exception excecao) {
-			excecao.printStackTrace(); // printStackTrace() fala qual foi a exceção
-			System.out.println("ROLLBACK EXECUTADO");
-			connection.close();
+			} catch (Exception excecao) {
+				excecao.printStackTrace(); // printStackTrace() fala qual foi a exceção
+				System.out.println("ROLLBACK EXECUTADO");
+			}
 		}
-
 	}
 
 	private static void adicionarVariavel(String nome, String descricao, PreparedStatement stm) throws SQLException {
@@ -44,12 +41,12 @@ public class TestaInsercaoComParametro {
 
 		stm.execute();
 
-		ResultSet rst = stm.getGeneratedKeys();
-		while (rst.next()) {
-			Integer id = rst.getInt(1);
-			System.out.println("O id criado foi: " + id);
+		try (ResultSet rst = stm.getGeneratedKeys()) {
+			while (rst.next()) {
+				Integer id = rst.getInt(1);
+				System.out.println("O id criado foi: " + id);
+			}
 		}
-		rst.close();
 	}
 
 }
