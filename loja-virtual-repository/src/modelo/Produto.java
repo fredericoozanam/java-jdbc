@@ -1,4 +1,4 @@
-package br.com.alura.jdbc.modelo;
+package modelo;
 
 public class Produto {
 
